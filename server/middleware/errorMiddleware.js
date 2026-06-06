@@ -21,7 +21,12 @@ const errorHandler = (err, req, res, next) => {
     // Handle Mongoose Duplicate Key Error
     if (err.code === 11000) {
         statusCode = 400;
-        message = 'Duplicate field value entered';
+        const field = Object.keys(err.keyPattern)[0];
+        if (field === 'email') {
+            message = 'This email is already registered. Please login or use a different email.';
+        } else {
+            message = `This ${field} is already in use. Please try a different value.`;
+        }
     }
 
     // Handle Mongoose Cast Error (Invalid ID)
