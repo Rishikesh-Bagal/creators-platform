@@ -16,10 +16,13 @@ export const registerUser = async (req, res, next) => {
             return next(error);
         }
 
-        // Check if user already exists
-        const existingUser = await User.findOne({ email });
+        // Normalize email to lowercase for consistent checking
+        const normalizedEmail = email.toLowerCase();
+
+        // Check if user already exists (case-insensitive)
+        const existingUser = await User.findOne({ email: normalizedEmail });
         if (existingUser) {
-            const error = new Error('A user with this email already exists');
+            const error = new Error('This email is already registered. Please login or use a different email.');
             error.status = 400;
             return next(error);
         }
@@ -31,7 +34,7 @@ export const registerUser = async (req, res, next) => {
         // Create user
         const user = await User.create({
             name,
-            email,
+            email: normalizedEmail,
             password: hashedPassword,
         });
 
@@ -54,6 +57,12 @@ export const registerUser = async (req, res, next) => {
             }
         });
     } catch (error) {
+        // Handle MongoDB duplicate key error
+        if (error.code === 11000) {
+            const error_new = new Error('This email is already registered. Please login or use a different email.');
+            error_new.status = 400;
+            return next(error_new);
+        }
         next(error);
     }
 };
