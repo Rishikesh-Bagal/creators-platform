@@ -1,5 +1,6 @@
 import request from 'supertest';
 import mongoose from 'mongoose';
+import { MongoMemoryServer } from 'mongodb-memory-server';
 import { app } from '../app.js';
 import User from '../models/User.js';
 import dotenv from 'dotenv';
@@ -8,10 +9,13 @@ dotenv.config();
 
 // Comment to trigger PR CI
 
+let mongoServer;
+
 describe('Auth Routes', () => {
     // 1. Connect to DB before tests
     beforeAll(async () => {
-        const dbUri = process.env.MONGODB_URI_TEST || 'mongodb://127.0.0.1:27017/creators-platform-test';
+        mongoServer = await MongoMemoryServer.create();
+        const dbUri = mongoServer.getUri();
         await mongoose.connect(dbUri);
     });
 
@@ -23,6 +27,9 @@ describe('Auth Routes', () => {
     // 3. Close connection after all tests
     afterAll(async () => {
         await mongoose.connection.close();
+        if (mongoServer) {
+            await mongoServer.stop();
+        }
     });
 
     describe('POST /api/auth/register', () => {
