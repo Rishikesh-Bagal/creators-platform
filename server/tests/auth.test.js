@@ -8,6 +8,14 @@ import dotenv from 'dotenv';
 dotenv.config();
 process.env.JWT_SECRET = process.env.JWT_SECRET || 'test-secret-key';
 
+dotenv.config();
+
+process.env.JWT_SECRET =
+  process.env.JWT_SECRET || 'test-secret-key';
+
+process.env.JWT_EXPIRE =
+  process.env.JWT_EXPIRE || '7d';
+
 // Comment to trigger PR CI
 
 let mongoServer;
