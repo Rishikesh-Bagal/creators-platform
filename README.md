@@ -1,88 +1,154 @@
-# Creators Platform
+# ✍️ Creators Platform
 
-A professional full-stack MERN application for content creators to manage their posts. This project integrates authentication, authorization, CRUD operations with pagination, and centralized error handling.
+Creators Platform is a full-stack MERN application that enables content creators to manage their posts efficiently. It features secure authentication, role-based access, CRUD operations, pagination, and a responsive user interface designed for a seamless content management experience.
 
-## Features
+## 🌐 Live Demo
 
-- **Authentication**: JWT-based registration and login flows.
-- **Persistent Sessions**: User authentication state preserved on page refresh.
-- **Protected Routes**: Secure access to dashboard and content creation pages.
-- **CRUD Operations**: Full Create, Read, Update, and Delete functionality for posts.
-- **Pagination**: Scalable list viewing using limit and skip.
-- **Error Handling**: Graceful full-stack error management with toast notifications.
-- **Responsive Design**: Modern, clean UI built with React.
+**🔗 Live Application:** https://creators-platform-dun.vercel.app/
 
-## Technology Stack
+---
 
-- **Frontend**: React, React Router, Context API, Axios, React-Toastify.
-- **Backend**: Node.js, Express, MongoDB, Mongoose, JSON Web Token (JWT).
-- **Styling**: Vanilla CSS.
+## ✨ Features
 
-## Project Structure
+* 🔐 **JWT Authentication** – Secure user registration and login.
+* 💾 **Persistent Sessions** – Authentication state is maintained across page refreshes.
+* 🛡️ **Protected Routes** – Restrict access to authenticated users only.
+* 📝 **Complete CRUD Operations** – Create, read, update, and delete posts.
+* 📄 **Pagination** – Efficient browsing of large datasets using limit and skip.
+* ⚠️ **Centralized Error Handling** – User-friendly error management with toast notifications.
+* 📱 **Responsive Design** – Clean and modern interface that works across devices.
 
-```text
-creators-platform/
-├── client/           # React frontend
-├── server/           # Express backend
-├── .gitignore        # Root gitignore
-└── README.md         # Project documentation
-```
+---
 
-## Setup Instructions
+## 🛠️ Tech Stack
 
-### Prerequisites
+### Frontend
 
-- Node.js installed
-- MongoDB database (local or Atlas)
+* React
+* React Router
+* Context API
+* Axios
+* React Toastify
 
-### 1. Clone the repository
+### Backend
+
+* Node.js
+* Express.js
+* MongoDB
+* Mongoose
+* JSON Web Token (JWT)
+
+### Styling
+
+* Vanilla CSS
+
+---
+
+## 🚀 Getting Started
+
+### 1. Clone the Repository
+
 ```bash
 git clone <repository-url>
 cd creators-platform
 ```
 
+---
+
 ### 2. Backend Setup
-1. Navigate to the `server` directory:
-   ```bash
-   cd server
-   ```
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Create a `.env` file based on `.env.example`:
-   ```env
-   PORT=5000
-   MONGO_URI=your_mongodb_connection_string
-   JWT_SECRET=your_jwt_secret
-   JWT_EXPIRE=30d
-   ```
-4. Start the server:
-   ```bash
-   npm run dev
-   ```
+
+Navigate to the backend directory.
+
+```bash
+cd server
+```
+
+Install dependencies.
+
+```bash
+npm install
+```
+
+Create a `.env` file.
+
+```env
+PORT=5000
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=your_jwt_secret
+JWT_EXPIRE=30d
+```
+
+Start the backend server.
+
+```bash
+npm run dev
+```
+
+---
 
 ### 3. Frontend Setup
-1. Navigate to the `client` directory:
-   ```bash
-   cd ../client
-   ```
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Create a `.env` file:
-   ```env
-   VITE_API_URL=http://localhost:5000/api
-   ```
-4. Start the frontend:
-   ```bash
-   npm run dev
-   ```
 
-## Usage
+Navigate to the frontend directory.
 
-1. Register a new account.
-2. Login to access your personal dashboard.
-3. Create new posts, view them with pagination, edit, or delete them as needed.
-4. Logout to secure your session.
+```bash
+cd ../client
+```
+
+Install dependencies.
+
+```bash
+npm install
+```
+
+Create a `.env` file.
+
+```env
+VITE_API_URL=http://localhost:5000/api
+```
+
+Start the frontend development server.
+
+```bash
+npm run dev
+```
+
+---
+
+## 📂 Project Structure
+
+```text
+creators-platform/
+│
+├── client/            # React frontend
+├── server/            # Express backend
+├── .gitignore
+└── README.md
+```
+
+---
+
+## 💡 Core Functionality
+
+* User registration and login
+* JWT-based authentication
+* Protected routes
+* Create, edit, and delete posts
+* Paginated post listing
+* Persistent user sessions
+* Toast-based notifications
+* Responsive user interface
+
+---
+
+## 📄 License
+
+This project was developed for learning and portfolio purposes. Feel free to explore the source code and use it as a reference for your own projects.
+
+---
+
+## 👨‍💻 Author
+
+**Rishikesh Bagal**
+
+* GitHub: https://github.com/Rishikesh-Bagal
+* Live Demo: https://creators-platform-dun.vercel.app/
