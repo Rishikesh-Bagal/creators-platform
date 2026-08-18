@@ -1,9 +1,11 @@
 import dotenv from 'dotenv';
+
+// Load environment variables FIRST - before any other imports
+// This ensures process.env is populated when app.js and db.js are loaded
+dotenv.config();
+
 import { httpServer } from './app.js';
 import connectDB from './config/db.js';
-
-// Load environment variables
-dotenv.config();
 
 // Connect to MongoDB
 connectDB();
