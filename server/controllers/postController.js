@@ -1,7 +1,8 @@
 import Post from '../models/Post.js';
 import User from '../models/User.js';
+import { capitalizeTitle } from '../utils/textFormatter.js';
 
-// @desc    Create new post (with Socket.io event emission)
+// @desc    Create new post (with Socket.io event emission and Hoisting Demo)
 // @route   POST /api/posts
 // @access  Private
 export const createPostWithSocket = (io) => async (req, res, next) => {
@@ -14,8 +15,11 @@ export const createPostWithSocket = (io) => async (req, res, next) => {
             return next(error);
         }
 
+        // Use the hoisted formatting utility
+        const formattedTitle = capitalizeTitle(title);
+
         const post = await Post.create({
-            title,
+            title: formattedTitle,
             content,
             coverImage,
             author: req.user.id // From protect middleware
@@ -107,23 +111,50 @@ export const getPosts = async (req, res, next) => {
         next(error);
     }
 };
+// @desc    Get all public posts (with pagination)
+// @route   GET /api/posts/public
+// @access  Public
+export const getPublicPosts = async (req, res, next) => {
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+
+        const total = await Post.countDocuments({});
+        const posts = await Post.find({})
+            .populate('author', 'name')
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit);
+
+        res.status(200).json({
+            success: true,
+            count: posts.length,
+            pagination: {
+                total,
+                page,
+                limit,
+                totalPages: Math.ceil(total / limit),
+                hasNextPage: page * limit < total,
+                hasPrevPage: page > 1
+            },
+            data: posts
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 // @desc    Get post by ID
 // @route   GET /api/posts/:id
-// @access  Private
+// @access  Public
 export const getPostById = async (req, res, next) => {
     try {
-        const post = await Post.findById(req.params.id);
+        const post = await Post.findById(req.params.id).populate('author', 'name');
 
         if (!post) {
             const error = new Error('Post not found');
             error.status = 404;
-            return next(error);
-        }
-
-        // Authorize: Check if post belongs to user
-        if (post.author.toString() !== req.user.id) {
-            const error = new Error('Not authorized to view this post');
-            error.status = 403;
             return next(error);
         }
 

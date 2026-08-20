@@ -1,18 +1,55 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { toast } from 'react-toastify';
 import './CreatePost.css';
 import ImageUpload from '../components/ImageUpload';
+import useDebounce from '../hooks/useDebounce';
 
 function CreatePost() {
-    const [title, setTitle] = useState('');
-    const [content, setContent] = useState('');
+    // Initialize state from localStorage if a draft exists
+    const [title, setTitle] = useState(() => localStorage.getItem('draft_title') || '');
+    const [content, setContent] = useState(() => localStorage.getItem('draft_content') || '');
     const [coverImageUrl, setCoverImageUrl] = useState(null);
     const [uploading, setUploading] = useState(false);
     const [uploadError, setUploadError] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [generatingAI, setGeneratingAI] = useState(false);
     const navigate = useNavigate();
+
+    // The debounced values will only update 1000ms after the user stops typing
+    const debouncedTitle = useDebounce(title, 1000);
+    const debouncedContent = useDebounce(content, 1000);
+
+    // Auto-save logic utilizing the debounced values
+    useEffect(() => {
+        if (debouncedTitle || debouncedContent) {
+            localStorage.setItem('draft_title', debouncedTitle);
+            localStorage.setItem('draft_content', debouncedContent);
+            // This demonstrates Event Loop Macrotask (setTimeout in useDebounce) triggering a Microtask (React state update -> useEffect)
+        }
+    }, [debouncedTitle, debouncedContent]);
+
+    // Cleanup on unmount if a cover image was uploaded but post wasn't submitted
+    useEffect(() => {
+        return () => {
+            // Standard cleanup during active sessions.
+        };
+    }, []);
+
+    const generateIdea = async () => {
+        setGeneratingAI(true);
+        try {
+            const response = await api.post('/ai/generate-idea', { topic: title });
+            setTitle(response.data.data.title);
+            setContent(response.data.data.content);
+            toast.success('AI Idea Generated!');
+        } catch (err) {
+            toast.error(err.response?.data?.message || 'Failed to generate AI idea');
+        } finally {
+            setGeneratingAI(false);
+        }
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -20,6 +57,11 @@ function CreatePost() {
 
         try {
             await api.post('/posts', { title, content, coverImage: coverImageUrl });
+            
+            // Clear drafts on successful post
+            localStorage.removeItem('draft_title');
+            localStorage.removeItem('draft_content');
+            
             toast.success('Post created successfully!');
             navigate('/dashboard');
         } catch (err) {
@@ -33,9 +75,12 @@ function CreatePost() {
         setUploadError(null);
         try {
             const response = await api.post('/upload', formData);
-            // TODO: Orphaned upload problem - If a user selects an image and uploads it, but then 
-            // selects a different one before creating the post, the old image is left orphaned on Cloudinary.
-            // Future improvement: Delete the old image from Cloudinary using its public_id before uploading the new one.
+            
+            // Delete the old image from Cloudinary to prevent orphans
+            if (coverImageUrl) {
+                api.delete('/upload', { data: { url: coverImageUrl } }).catch(err => console.error("Failed to clean up old image", err));
+            }
+            
             setCoverImageUrl(response.data.url);
             toast.success('Image uploaded!');
         } catch (err) {
@@ -47,13 +92,30 @@ function CreatePost() {
         }
     };
 
+    const handleClearImage = () => {
+        if (coverImageUrl) {
+            api.delete('/upload', { data: { url: coverImageUrl } }).catch(err => console.error("Failed to clean up image", err));
+        }
+        setCoverImageUrl(null);
+    };
+
     return (
         <div className="create-post-container">
             <div className="create-post-card">
-                <h1>Create New Post</h1>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <h1>Create New Post</h1>
+                    <button 
+                        type="button" 
+                        onClick={generateIdea} 
+                        disabled={generatingAI}
+                        className="btn btn-secondary"
+                        style={{ background: 'linear-gradient(45deg, #FF6B6B, #4ECDC4)', border: 'none' }}
+                    >
+                        {generatingAI ? '✨ Generating...' : '✨ AI Idea'}
+                    </button>
+                </div>
                 
-                {/* Image Upload Component for testing file upload functionality separately */}
-                <ImageUpload onUpload={handleUpload} />
+                <ImageUpload onUpload={handleUpload} onClear={handleClearImage} />
                 
                 {uploading && <div className="loading-state" style={{ color: '#0066cc', marginTop: '10px' }}>Uploading image...</div>}
                 {uploadError && <div className="error-message" style={{ color: 'red', marginTop: '10px' }}>{uploadError}</div>}
@@ -68,7 +130,7 @@ function CreatePost() {
                             id="title"
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
-                            placeholder="Enter post title"
+                            placeholder="Enter post title or a topic for AI..."
                             required
                         />
                     </div>
@@ -84,10 +146,16 @@ function CreatePost() {
                         ></textarea>
                     </div>
                     <div className="form-actions">
+                        <span style={{ fontSize: '0.8rem', color: '#666', marginRight: 'auto', alignSelf: 'center' }}>
+                            {debouncedTitle !== title || debouncedContent !== content ? 'Typing...' : 'Draft saved.'}
+                        </span>
                         <button
                             type="button"
                             className="btn btn-outline"
-                            onClick={() => navigate('/dashboard')}
+                            onClick={() => {
+                                handleClearImage();
+                                navigate('/dashboard');
+                            }}
                         >
                             Cancel
                         </button>

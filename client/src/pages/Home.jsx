@@ -1,35 +1,29 @@
-import ConnectionTest from "../components/common/ConnectionTest";
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import ConnectionTest from "../components/common/ConnectionTest";
+import api from '../services/api';
 import './Home.css';
 
-const featuredPosts = [
-    {
-        id: 1,
-        title: 'Getting Started with React in 2025',
-        excerpt: 'A comprehensive guide for beginners diving into the React ecosystem, covering hooks, routing, and state management.',
-        author: 'Alex Rivera',
-        date: 'Feb 20, 2025',
-        tag: 'React',
-    },
-    {
-        id: 2,
-        title: 'Building RESTful APIs with Node.js',
-        excerpt: 'Learn how to design and implement scalable REST APIs using Express, MongoDB, and best practices.',
-        author: 'Priya Sharma',
-        date: 'Feb 18, 2025',
-        tag: 'Node.js',
-    },
-    {
-        id: 3,
-        title: 'The Art of Clean Code',
-        excerpt: 'Principles and practices that every developer should follow to write maintainable, readable code.',
-        author: 'Sam Chen',
-        date: 'Feb 15, 2025',
-        tag: 'Best Practices',
-    },
-];
-
 function Home() {
+    const [posts, setPosts] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        const fetchPosts = async () => {
+            try {
+                const response = await api.get('/posts/public?limit=6');
+                setPosts(response.data.data);
+                setLoading(false);
+            } catch (err) {
+                setError(err.response?.data?.message || 'Failed to fetch posts');
+                setLoading(false);
+            }
+        };
+
+        fetchPosts();
+    }, []);
+
     return (
         <main className="home">
             {/* Hero */}
@@ -56,19 +50,43 @@ function Home() {
                 <div className="section-inner">
                     <h2 className="section-title">Featured Posts</h2>
                     <p className="section-subtitle">Handpicked articles from our top creators</p>
-                    <div className="posts-grid">
-                        {featuredPosts.map((post) => (
-                            <article key={post.id} className="post-card">
-                                <span className="post-tag">{post.tag}</span>
-                                <h3 className="post-title">{post.title}</h3>
-                                <p className="post-excerpt">{post.excerpt}</p>
-                                <div className="post-meta">
-                                    <span className="post-author">👤 {post.author}</span>
-                                    <span className="post-date">{post.date}</span>
-                                </div>
-                            </article>
-                        ))}
-                    </div>
+                    
+                    {loading && <div style={{ textAlign: 'center', padding: '2rem' }}>Loading posts...</div>}
+                    {error && <div style={{ textAlign: 'center', color: 'red', padding: '2rem' }}>{error}</div>}
+                    
+                    {!loading && !error && posts.length === 0 && (
+                        <div style={{ textAlign: 'center', padding: '2rem', color: '#666' }}>
+                            No posts found. Be the first to create one!
+                        </div>
+                    )}
+
+                    {!loading && !error && posts.length > 0 && (
+                        <div className="posts-grid">
+                            {posts.map((post) => (
+                                <article key={post._id} className="post-card">
+                                    {post.coverImage && (
+                                        <Link to={`/post/${post._id}`}>
+                                            <img 
+                                                src={post.coverImage} 
+                                                alt={post.title} 
+                                                style={{ width: '100%', height: '180px', objectFit: 'cover', borderTopLeftRadius: '8px', borderTopRightRadius: '8px' }} 
+                                            />
+                                        </Link>
+                                    )}
+                                    <div style={{ padding: post.coverImage ? '1rem 0 0 0' : '0' }}>
+                                        <Link to={`/post/${post._id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                                            <h3 className="post-title">{post.title}</h3>
+                                        </Link>
+                                        <p className="post-excerpt">{post.content.substring(0, 100)}...</p>
+                                        <div className="post-meta">
+                                            <span className="post-author">👤 {post.author?.name || 'Unknown'}</span>
+                                            <span className="post-date">{new Date(post.createdAt).toLocaleDateString()}</span>
+                                        </div>
+                                    </div>
+                                </article>
+                            ))}
+                        </div>
+                    )}
                 </div>
             </section>
 
@@ -85,7 +103,6 @@ function Home() {
             <section style={{ padding: "40px", textAlign: "center" }}>
                 <ConnectionTest />
             </section>
-
         </main>
     );
 }

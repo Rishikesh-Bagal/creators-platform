@@ -7,6 +7,7 @@ import userRoutes from './routes/userRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import postRoutesFactory from './routes/postRoutes.js';
 import uploadRoutes from './routes/upload.js';
+import aiRoutes from './routes/aiRoutes.js';
 import errorHandler from './middleware/errorMiddleware.js';
 
 const app = express();
@@ -85,6 +86,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/posts', postRoutesFactory(io));
 app.use('/api/upload', uploadRoutes);
+app.use('/api/ai', aiRoutes);
 
 // 404 Handler
 app.use((req, res, next) => {

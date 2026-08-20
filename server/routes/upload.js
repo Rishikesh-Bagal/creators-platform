@@ -54,6 +54,41 @@ router.post('/', protect, upload.single('image'), async (req, res) => {
   }
 });
 
+// @route   DELETE /api/upload
+// @desc    Delete a file from Cloudinary
+// @access  Private
+router.delete('/', protect, async (req, res) => {
+  try {
+    const { url } = req.body;
+    
+    if (!url) {
+      return res.status(400).json({ success: false, message: 'URL is required' });
+    }
+
+    // Extract publicId from Cloudinary URL
+    // Format: https://res.cloudinary.com/.../.../creator-platform/filename.jpg
+    const parts = url.split('/');
+    const fileWithExtension = parts.pop();
+    const folder = parts.pop();
+    const filename = fileWithExtension.split('.')[0];
+    const publicId = `${folder}/${filename}`;
+
+    const result = await cloudinary.uploader.destroy(publicId);
+    
+    if (result.result === 'ok') {
+      res.status(200).json({ success: true, message: 'Image deleted' });
+    } else {
+      res.status(400).json({ success: false, message: 'Failed to delete image' });
+    }
+  } catch (error) {
+    console.error('Delete error:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Failed to delete image',
+    });
+  }
+});
+
 // Multer error handling middleware (must have 4 parameters)
 router.use((error, req, res, next) => {
   if (error instanceof express.Error || error.message.includes('MulterError') || error.message.includes('Only image files')) {

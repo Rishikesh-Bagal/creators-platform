@@ -1,9 +1,15 @@
 import React, { useState, useEffect } from 'react';
 
-const ImageUpload = ({ onUpload }) => {
+const ImageUpload = ({ onUpload, initialImage = null, onClear = null }) => {
     const [selectedFile, setSelectedFile] = useState(null);
-    const [previewUrl, setPreviewUrl] = useState(null);
+    const [previewUrl, setPreviewUrl] = useState(initialImage);
     const [error, setError] = useState(null);
+
+    useEffect(() => {
+        if (initialImage) {
+            setPreviewUrl(initialImage);
+        }
+    }, [initialImage]);
 
     const validateFile = (file) => {
         const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
@@ -23,13 +29,13 @@ const ImageUpload = ({ onUpload }) => {
         const file = e.target.files[0];
         
         // Revoke the old URL synchronously inside handleFileChange before calling setPreviewUrl
-        if (previewUrl) {
+        if (previewUrl && previewUrl !== initialImage) {
             URL.revokeObjectURL(previewUrl);
         }
 
         if (!file) {
             setSelectedFile(null);
-            setPreviewUrl(null);
+            setPreviewUrl(initialImage);
             setError(null);
             return;
         }
@@ -39,7 +45,7 @@ const ImageUpload = ({ onUpload }) => {
         if (validationError) {
             setError(validationError);
             setSelectedFile(null);
-            setPreviewUrl(null);
+            setPreviewUrl(initialImage);
             return;
         }
 
@@ -52,11 +58,11 @@ const ImageUpload = ({ onUpload }) => {
 
     useEffect(() => {
         return () => {
-            if (previewUrl) {
+            if (previewUrl && previewUrl !== initialImage) {
                 URL.revokeObjectURL(previewUrl);
             }
         };
-    }, [previewUrl]);
+    }, [previewUrl, initialImage]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -70,6 +76,19 @@ const ImageUpload = ({ onUpload }) => {
 
         if (onUpload) {
             onUpload(formData);
+        }
+    };
+
+    const handleClear = () => {
+        setSelectedFile(null);
+        setPreviewUrl(null);
+        setError(null);
+        // Reset file input
+        const input = document.getElementById('imageUploadInput');
+        if (input) input.value = '';
+        
+        if (onClear) {
+            onClear();
         }
     };
 
@@ -103,9 +122,13 @@ const ImageUpload = ({ onUpload }) => {
                             maxWidth: '300px',
                             maxHeight: '300px',
                             objectFit: 'cover',
-                            borderRadius: '8px'
+                            borderRadius: '8px',
+                            marginBottom: '10px'
                         }}
                     />
+                    <div>
+                        <button type="button" onClick={handleClear} className="btn btn-outline btn-small">Clear Image</button>
+                    </div>
                 </div>
             )}
 
