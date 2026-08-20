@@ -1,0 +1,64 @@
+.sql-demo-container {
+  padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.sql-demo-container h2 {
+  color: var(--primary-color, #333);
+  margin-bottom: 1rem;
+}
+
+.table-container {
+  margin: 2rem 0;
+  overflow-x: auto;
+}
+
+.sql-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: var(--card-bg, #fff);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.sql-table th,
+.sql-table td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color, #eee);
+}
+
+.sql-table th {
+  background-color: var(--primary-color, #f4f4f4);
+  font-weight: 600;
+}
+
+.sql-table tr:hover {
+  background-color: var(--hover-bg, #f9f9f9);
+}
+
+.error-message {
+  padding: 1rem;
+  background-color: #fee2e2;
+  color: #ef4444;
+  border-radius: 4px;
+  margin: 1rem 0;
+}
+
+.sql-info {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background-color: #1e293b;
+  color: #f8fafc;
+  border-radius: 8px;
+}
+
+.sql-info pre {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: #0f172a;
+  border-radius: 4px;
+  overflow-x: auto;
+}

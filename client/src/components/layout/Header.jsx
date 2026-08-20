@@ -21,6 +21,13 @@ function Header() {
                     >
                         Home
                     </NavLink>
+                    <NavLink
+                        to="/sql-demo"
+                        className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
+                        end
+                    >
+                        SQL JOINs
+                    </NavLink>
 
                     {isAuthenticated() ? (
                         <>

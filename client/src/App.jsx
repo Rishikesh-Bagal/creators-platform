@@ -11,6 +11,7 @@ import Dashboard from './pages/Dashboard';
 import CreatePost from './pages/CreatePost';
 import EditPost from './pages/EditPost';
 import PostView from './pages/PostView';
+import SqlDemo from './pages/SqlDemo';
 import NotFound from './pages/NotFound';
 
 import ProtectedRoute from './components/common/ProtectedRoute';
@@ -34,6 +35,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/post/:id" element={<PostView />} />
+            <Route path="/sql-demo" element={<SqlDemo />} />
             <Route
               path="/login"
               element={
