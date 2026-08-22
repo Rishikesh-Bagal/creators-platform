@@ -1,8 +1,9 @@
 import express from 'express';
-import { getCreatorsWithProfiles } from '../controllers/sqlController.js';
+import { getPostsWithAuthors } from '../controllers/sqlController.js';
 
 const router = express.Router();
 
-router.get('/creators', getCreatorsWithProfiles);
+// Route: GET /api/sql/posts
+router.get('/posts', getPostsWithAuthors);
 
 export default router;

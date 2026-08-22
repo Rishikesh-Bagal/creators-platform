@@ -21,16 +21,31 @@ function Dashboard() {
     const [totalPosts, setTotalPosts] = useState(0);
 
     const fetchPosts = useCallback(async (pageNum) => {
+        // EVENT LOOP & ASYNC/AWAIT DEMONSTRATION:
+        // 1. Synchronous code executes first (Call Stack)
+        console.log("A: Starting fetchPosts (Synchronous execution)");
+        
         setLoading(true);
         try {
+            // 2. The `await` keyword pauses execution of this function.
+            // The actual API request is offloaded to Web APIs (browser).
+            console.log("B: Awaiting api.get (Offloading to Web API)");
             const response = await api.get(`/posts?page=${pageNum}&limit=5`);
+            
+            // 3. Once the Promise resolves, this continuation is pushed to the Microtask Queue
+            // and executed by the Event Loop.
+            console.log("C: Promise resolved, updating state (Microtask Queue execution)");
+            
             setPosts(response.data.data);
             setTotalPages(response.data.pagination.totalPages);
             setTotalPosts(response.data.pagination.total);
-            setLoading(false);
         } catch (err) {
+            // Proper error handling for async operations
             const message = err.response?.data?.message || 'Failed to load posts';
             toast.error(message);
+        } finally {
+            // `finally` always executes regardless of success or failure
+            console.log("D: fetchPosts complete (Finally block)");
             setLoading(false);
         }
     }, []);

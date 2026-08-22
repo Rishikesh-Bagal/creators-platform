@@ -6,6 +6,34 @@ import './CreatePost.css';
 import ImageUpload from '../components/ImageUpload';
 import useDebounce from '../hooks/useDebounce';
 
+/**
+ * CLOSURE DEMONSTRATION:
+ * This factory function creates an autosaver. 
+ * The inner function retains access to `lastSavedTime` and `saveCount` 
+ * from its outer lexical scope, even after `createAutosaver` has finished executing.
+ */
+function createAutosaver() {
+    let lastSavedTime = null;
+    let saveCount = 0;
+
+    return function saveDraft(title, content) {
+        if (!title && !content) return false;
+        
+        localStorage.setItem('draft_title', title);
+        localStorage.setItem('draft_content', content);
+        
+        // These variables are preserved in the closure across multiple calls
+        lastSavedTime = new Date().toLocaleTimeString();
+        saveCount++;
+        
+        console.log(`[Closure Log] Draft saved at ${lastSavedTime}. Total saves: ${saveCount}`);
+        return true;
+    };
+}
+
+// Instantiate the closure
+const saveDraft = createAutosaver();
+
 function CreatePost() {
     // Initialize state from localStorage if a draft exists
     const [title, setTitle] = useState(() => localStorage.getItem('draft_title') || '');
@@ -21,12 +49,11 @@ function CreatePost() {
     const debouncedTitle = useDebounce(title, 1000);
     const debouncedContent = useDebounce(content, 1000);
 
-    // Auto-save logic utilizing the debounced values
+    // Auto-save logic utilizing the debounced values and the closure
     useEffect(() => {
         if (debouncedTitle || debouncedContent) {
-            localStorage.setItem('draft_title', debouncedTitle);
-            localStorage.setItem('draft_content', debouncedContent);
-            // This demonstrates Event Loop Macrotask (setTimeout in useDebounce) triggering a Microtask (React state update -> useEffect)
+            // Calling the closure inner function
+            saveDraft(debouncedTitle, debouncedContent);
         }
     }, [debouncedTitle, debouncedContent]);
 

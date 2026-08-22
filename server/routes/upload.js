@@ -6,7 +6,11 @@ import { protect } from '../middleware/auth.js';
 const router = express.Router();
 
 /**
- * Helper function to upload a buffer to Cloudinary using upload_stream
+ * PROMISES VS CALLBACKS DEMONSTRATION:
+ * The cloudinary.uploader.upload_stream API uses a callback pattern.
+ * Here we convert it into a Promise-based flow, allowing us to consume
+ * it cleanly using async/await without callback hell.
+ * 
  * @param {Buffer} buffer - The file buffer from Multer
  * @returns {Promise} - Resolves with Cloudinary upload result
  */

@@ -16,6 +16,9 @@ async function runVerification() {
     // 1. Get a token (Assume a test user exists, if not, we might need a separate script to create one)
     // For this verification, I'll try to login with a common test credential
     // If it fails, I'll provide instructions on how to provide a valid token
+    // ENVIRONMENT VARIABLES DEMONSTRATION:
+    // We use process.env to read sensitive data like tokens or secrets,
+    // ensuring they are never hard-coded in the source files.
     let token = process.env.TEST_TOKEN;
     if (!token) {
       try {
@@ -32,7 +35,7 @@ async function runVerification() {
         process.exit(1);
       }
     } else {
-      console.log('🔑 Using token from environment variable.\n');
+      console.log('🔑 Using token from environment variable (process.env.TEST_TOKEN).\n');
     }
 
     const headers = {
